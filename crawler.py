@@ -5,6 +5,7 @@ import time
 import mysql.connector
 import config
 import datetime
+import sys
 from dateutil import parser
 
 cnx = mysql.connector.connect(host=config.db_host, user=config.db_user, passwd=config.db_password, database=config.db_database)
@@ -15,10 +16,10 @@ def crawl(id_list,update_time):
 		while True:
 			try:
 				result = requests.get('https://www.dcard.tw/api/post/all/' + str(post_id)).json()
-				print 'https://www.dcard.tw/api/post/all/' + str(post_id)
 				parse_result(post_id,result,update_time)
 				break
 			except requests.exceptions.ConnectionError:
+				print 'https://www.dcard.tw/api/post/all/' + str(post_id)
 				print str(post_id) + ' error: ' + 'connection error.'
 				time.sleep(5)
 				continue
@@ -26,6 +27,7 @@ def crawl(id_list,update_time):
 def parse_result(post_id,raw_data,update_time):
 	#print raw_data
 	if 'error' in raw_data and raw_data['error'] is True:
+		print 'https://www.dcard.tw/api/post/all/' + str(post_id)
 		print str(post_id) + ' error: ' + raw_data['msg']
 		return
 	write_post(post_id,raw_data,update_time)
@@ -133,6 +135,27 @@ def parse_datetime(input_time):
 
 
 if __name__ == '__main__':
+	last_days = 7
+	new_post_count = 100
+	now_datetime = datetime.datetime.now()
+	page_list = []
+	if sys.argv[1] == 'last':
+		if len(sys.argv) > 2:
+			last_days = sys.argv[2]
+		sql = 'SELECT id FROM posts WHERE createdAt>=%s AND createdAt<=%s'
+		cur.execute(sql,(now_datetime - datetime.timedelta(days=last_days),now_datetime))
+		results = cur.fetchall()
+		for result in results:
+			page_list.append(result[0])
+	elif sys.argv[1] == 'new':
+		if len(sys.argv)> 2:
+			new_post_count = sys.argv[2]
+		sql = 'SELECT MAX(id) FROM posts'
+		cur.execute(sql)
+		result = cur.fetchone()
+		page_list = range(result[0]+1,result[0]+1+new_post_count)
+	#print len(page_list)
 	update_time = datetime.datetime.now()
-	page_list = range(30081, 300000)
+	print 'Start update('+sys.argv[1]+'): ' + str(update_time)
+	#page_list = range(30081, 300000)
 	crawl(page_list,update_time)
