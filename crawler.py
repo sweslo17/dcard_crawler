@@ -137,11 +137,12 @@ def parse_datetime(input_time):
 if __name__ == '__main__':
 	last_days = 7
 	new_post_count = 100
+	new_post_update_hours = 2
 	now_datetime = datetime.datetime.now()
 	page_list = []
 	if sys.argv[1] == 'last':
 		if len(sys.argv) > 2:
-			last_days = sys.argv[2]
+			last_days = int(sys.argv[2])
 		sql = 'SELECT id FROM posts WHERE createdAt>=%s AND createdAt<=%s'
 		cur.execute(sql,(now_datetime - datetime.timedelta(days=last_days),now_datetime))
 		results = cur.fetchall()
@@ -152,9 +153,16 @@ if __name__ == '__main__':
 			new_post_count = sys.argv[2]
 		sql = 'SELECT MAX(id) FROM posts'
 		cur.execute(sql)
-		result = cur.fetchone()
-		page_list = range(result[0]+1,result[0]+1+new_post_count)
-	#print len(page_list)
+		max_id = cur.fetchone()[0]
+		sql = 'SELECT id FROM posts WHERE createdAt>=%s'
+		cur.execute(sql,(now_datetime - datetime.timedelta(hours=new_post_update_hours),))
+		results = cur.fetchall()
+		for result in results:
+			page_list.append(result[0])
+		for new_id in range(max_id+1,max_id+new_post_count+1):
+			page_list.append(new_id)
+		#page_list = range(result[0]+1-new_post_count*2,result[0]+1+new_post_count)
+	print len(page_list)
 	update_time = datetime.datetime.now()
 	print 'Start update('+sys.argv[1]+'): ' + str(update_time)
 	#page_list = range(30081, 300000)
