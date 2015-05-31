@@ -8,7 +8,7 @@ Dcard 文章/推文爬蟲
 # 安裝說明
 -------------------
 * 安裝MySQL資料庫
-*
+* 
 ```
 git clone https://github.com/sweslo17/chinese_sentiment.git
 pip install -r requirements.txt
