@@ -8,6 +8,7 @@ Dcard 文章/推文爬蟲
 # 安裝說明
 -------------------
 * 安裝MySQL資料庫
+* 執行`database/dcard.sql`、`database/dcard_posts.sql`、`database/dcard_comments.sql`
 * 
 ```
 git clone https://github.com/sweslo17/chinese_sentiment.git
