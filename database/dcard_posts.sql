@@ -1,5 +1,5 @@
 CREATE TABLE `posts` (
-		`id` varchar(50) NOT NULL,
+		`id` int(11) NOT NULL,
 		`forum_alias` varchar(50) DEFAULT NULL,
 		`excerpt` varchar(500) DEFAULT NULL,
 		`pinned` tinyint(1) DEFAULT NULL,
@@ -29,3 +29,4 @@ CREATE TABLE `posts` (
 		KEY `author_school` (`author_school`),
 		KEY `author_department` (`author_department`(333))
 	) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
